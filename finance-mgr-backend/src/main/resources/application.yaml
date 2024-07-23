@@ -1,1 +1,3 @@
-spring.application.name=finance-mgr-backend
+spring:
+  profiles:
+    active: ${APP_ACTIVE_PROFILE:local}
