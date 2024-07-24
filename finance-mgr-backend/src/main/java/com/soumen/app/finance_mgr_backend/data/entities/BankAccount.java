@@ -21,7 +21,7 @@ public abstract class BankAccount {
     @ManyToOne
     @JoinColumn(name = "bank_id")
     private Bank bank;
-    private BigDecimal balance;
+    private Double balance;
     private AccountType accountType;
     private String accountNumber;
     private Double rateOfInterest;
