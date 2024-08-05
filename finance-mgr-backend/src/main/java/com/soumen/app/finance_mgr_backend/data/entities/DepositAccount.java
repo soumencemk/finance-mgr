@@ -17,5 +17,4 @@ public class DepositAccount extends BankAccount {
     private Date matureDate;
     private Double maturityAmount;
     private PayoutType payoutType;
-    private Double appxMonthlyPayout;
 }

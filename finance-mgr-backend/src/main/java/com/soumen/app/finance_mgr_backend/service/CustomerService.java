@@ -2,10 +2,15 @@ package com.soumen.app.finance_mgr_backend.service;
 
 import com.soumen.app.finance_mgr_backend.data.entities.BankAccount;
 import com.soumen.app.finance_mgr_backend.data.entities.Customer;
+import com.soumen.app.finance_mgr_backend.data.entities.DepositAccount;
+import com.soumen.app.finance_mgr_backend.data.entities.SavingsAccount;
+import com.soumen.app.finance_mgr_backend.data.repositories.BankRepository;
 import com.soumen.app.finance_mgr_backend.data.repositories.CustomerRepository;
 import com.soumen.app.finance_mgr_backend.model.AccountInfoVO;
 import com.soumen.app.finance_mgr_backend.model.AccountType;
+import com.soumen.app.finance_mgr_backend.model.BankAccountVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -15,8 +20,10 @@ import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerService {
     private final CustomerRepository customerRepository;
+    private final BankRepository bankRepository;
 
 
     public Collection<Customer> getAllCustomers() {
@@ -80,5 +87,47 @@ public class CustomerService {
 
     public AccountInfoVO getFullAccountBalance(Long customerID) throws Throwable {
         return getFullAccountInfo(customerID, false);
+    }
+
+    public void addBankAccount(Long customerID, BankAccountVO bankAccountVO) {
+        if (bankAccountVO.type()
+                .equals(AccountType.SAVINGS)) {
+            log.info("Adding new Savings account : {}", bankAccountVO);
+            SavingsAccount bankAccount = new SavingsAccount();
+            bankAccount.setAccountNumber(bankAccountVO.accountNumber());
+            bankAccount.setBank(bankRepository.findByName(bankAccountVO.bankName())
+                    .orElseThrow(() -> new RuntimeException("Bank : " + bankAccountVO.bankName() + " not found")));
+            bankAccount.setBalance(bankAccountVO.balance());
+            bankAccount.setRateOfInterest(bankAccountVO.roi());
+            bankAccount.setAccountType(AccountType.SAVINGS);
+            Customer customer = customerRepository.findById(customerID)
+                    .get();
+            customer.getBankAccountList()
+                    .add(bankAccount);
+            customerRepository.saveAndFlush(customer);
+
+        } else {
+            log.info("Adding new Deposit account : {}", bankAccountVO);
+            DepositAccount bankAccount = new DepositAccount();
+            if (bankAccountVO.type()
+                    .equals(AccountType.DEPOSITS)) {
+                bankAccount.setAccountType(AccountType.DEPOSITS);
+                bankAccount.setAccountNumber(bankAccountVO.accountNumber());
+                bankAccount.setBank(bankRepository.findByName(bankAccountVO.bankName())
+                        .orElseThrow(RuntimeException::new));
+                bankAccount.setBalance(bankAccountVO.balance());
+                bankAccount.setRateOfInterest(bankAccountVO.roi());
+                bankAccount.setStartDate(bankAccountVO.startDate());
+                bankAccount.setMatureDate(bankAccountVO.matureDate());
+                bankAccount.setMaturityAmount(bankAccountVO.matAmount());
+                bankAccount.setPayoutType(bankAccountVO.payoutType());
+                Customer customer = customerRepository.findById(customerID)
+                        .get();
+                customer.getBankAccountList()
+                        .add(bankAccount);
+                customerRepository.saveAndFlush(customer);
+            }
+        }
+
     }
 }

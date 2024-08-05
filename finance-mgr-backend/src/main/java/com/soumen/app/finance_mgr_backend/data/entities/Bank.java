@@ -18,6 +18,7 @@ public class Bank {
     @GeneratedValue
     private long id;
     private String name;
+    private String fullName;
     private Currency currency;
     private String ifscCode;
     @OneToOne(cascade = CascadeType.ALL)

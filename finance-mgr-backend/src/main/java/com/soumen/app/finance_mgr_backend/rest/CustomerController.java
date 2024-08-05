@@ -3,12 +3,13 @@ package com.soumen.app.finance_mgr_backend.rest;
 
 import com.soumen.app.finance_mgr_backend.data.entities.Customer;
 import com.soumen.app.finance_mgr_backend.model.AccountInfoVO;
+import com.soumen.app.finance_mgr_backend.model.AppResponse;
+import com.soumen.app.finance_mgr_backend.model.BankAccountVO;
 import com.soumen.app.finance_mgr_backend.service.CustomerService;
+import com.soumen.app.finance_mgr_backend.util.ResponseUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -54,6 +55,15 @@ public class CustomerController {
     public AccountInfoVO getAccountsBalance(@PathVariable("id") Long customerID,
                                             @PathVariable("accountType") String accountType) throws Throwable {
         return customerService.getAccountsBalance(customerID, accountType);
+
+    }
+
+    @PostMapping("/{id}/accounts")
+    public ResponseEntity<AppResponse> addBankAccount(@PathVariable("id") Long customerID,
+                                                      @RequestBody BankAccountVO bankAccountVO) {
+
+        customerService.addBankAccount(customerID, bankAccountVO);
+        return ResponseUtil.successResponse();
 
     }
 

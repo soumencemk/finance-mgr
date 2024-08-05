@@ -8,7 +8,6 @@ import lombok.Data;
 @Entity
 @Data
 public class Address {
-
     @Id
     @GeneratedValue
     private Long id;
@@ -19,4 +18,5 @@ public class Address {
     private String country;
     private String phone;
     private String email;
+
 }
